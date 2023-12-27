@@ -1,2 +1,2 @@
 # poe-core
-A Golang tool/proces for creating modules 
+A Golang tool/proces for creating modules - updated 
