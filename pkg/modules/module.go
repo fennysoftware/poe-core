@@ -1,7 +1,7 @@
 package modules
 
 import (
-	packages "github.com/eshu0/poe-core/pkg/packages"
+	packages "github.com/fennysoftware/poe-core/pkg/packages"
 )
 
 type Module struct {
