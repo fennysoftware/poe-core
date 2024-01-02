@@ -6,9 +6,9 @@ import (
 
 type GoMember struct {
 	IMember
-	name          string
-	pointerPrefix bool
-	mtype         MemberType
+	name          string     `json:"name"`
+	pointerPrefix bool       `json:"pointer"`
+	mtype         MemberType `json:"type"`
 }
 
 func (gm GoMember) GetName() string {
