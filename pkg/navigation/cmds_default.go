@@ -9,11 +9,11 @@ const (
 	UPDIR = ".."
 )
 
-func exit(n *navigation.Navigator, args []string) (error, []string, bool) {
+func exit(n *Navigator, args []string) (error, []string, bool) {
 	return nil, []string{}, true
 }
 
-func printhlp(n *navigation.Navigator, args []string) (error, []string, bool) {
+func printhlp(n *Navigator, args []string) (error, []string, bool) {
 	res := []string{}
 	res = append(res, " ")
 	res = append(res, "Available Commands:")
@@ -50,19 +50,19 @@ func printhlp(n *navigation.Navigator, args []string) (error, []string, bool) {
 	return nil, res, false
 }
 
-func pwd(n *navigation.Navigator, args []string) (error, string, bool) {
+func pwd(n *Navigator, args []string) (error, []string, bool) {
 	res := []string{}
 	res = append(res, fmt.Sprintf("%s", n))
 	return nil, res, false
 }
 
-func lvl(n *navigation.Navigator, args []string) (error, []string, bool) {
+func lvl(n *Navigator, args []string) (error, []string, bool) {
 	res := []string{}
 	res = append(res, fmt.Sprintf("%s", n.Level()))
 	return nil, res, false
 }
 
-func changepos(n *navigation.Navigator, args []string) (error, []string, bool) {
+func changepos(n *Navigator, args []string) (error, []string, bool) {
 	res := []string{}
 	// moving up!
 	if len(args) == 1 && args[0] == UPDIR {
@@ -153,7 +153,7 @@ func changepos(n *navigation.Navigator, args []string) (error, []string, bool) {
 	return nil, res, false
 }
 
-func list(n *navigation.Navigator, args []string) (error, []string, bool) {
+func list(n *Navigator, args []string) (error, []string, bool) {
 	res := []string{}
 	if n.cwd.IsTop() {
 		for _, v := range n.projs {
@@ -162,19 +162,19 @@ func list(n *navigation.Navigator, args []string) (error, []string, bool) {
 	} else {
 
 		buffer := n.cwd.CurrentPathBuffer()
-		projname := buffer[navigation.Project]
+		projname := buffer[Project]
 		active, err := getActiveProject(n, projname)
 		if err != nil {
 			return err, res, false
 		}
 
 		switch n.cwd.CurrentLevel() {
-		case navigation.Project:
+		case Project:
 			for _, name := range active.ListModules() {
 				res = append(res, name)
 			}
-		case navigation.Module:
-			modname := buffer[navigation.Module]
+		case Module:
+			modname := buffer[Module]
 			mod, err := active.GetModule(modname)
 			if err != nil {
 				return err, res, false
@@ -182,14 +182,14 @@ func list(n *navigation.Navigator, args []string) (error, []string, bool) {
 			for _, name := range mod.ListPackages() {
 				res = append(res, name)
 			}
-		case navigation.Package:
-			modname := buffer[navigation.Module]
+		case Package:
+			modname := buffer[Module]
 			mod, err := active.GetModule(modname)
 			if err != nil {
 				return err, res, false
 			}
 
-			pkgname := buffer[navigation.Package]
+			pkgname := buffer[Package]
 			pkg, err := mod.GetPackage(pkgname)
 			if err != nil {
 				return err, res, false
@@ -216,14 +216,14 @@ func list(n *navigation.Navigator, args []string) (error, []string, bool) {
 					}
 				}
 			}
-		case navigation.StructInter:
-			modname := buffer[navigation.Module]
+		case StructInter:
+			modname := buffer[Module]
 			mod, err := active.GetModule(modname)
 			if err != nil {
 				return err, res, false
 			}
 
-			pkgname := buffer[navigation.Package]
+			pkgname := buffer[Package]
 			pkg, err := mod.GetPackage(pkgname)
 			if err != nil {
 				return err, res, false
@@ -268,7 +268,7 @@ func list(n *navigation.Navigator, args []string) (error, []string, bool) {
 	return nil, res, false
 }
 
-func pathbuf(n *navigation.Navigator, args []string) (error, []string, bool) {
+func pathbuf(n *Navigator, args []string) (error, []string, bool) {
 	res := []string{}
 	for lvl, name := range n.cwd.CurrentPathBuffer() {
 		res = append(res, fmt.Sprintf("%s : %s \n", lvl, name))

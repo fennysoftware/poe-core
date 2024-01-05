@@ -22,17 +22,13 @@ func (n *Navigator) AddCommand(c Command) {
 	n.methods = mds
 }
 
-func (n *Navigator) ReadCommand() string {
+func (n *Navigator) ReadCommand() []string {
 	command := readline(cwd.String() + " % ")
 	cmds := strings.Split(command, " ")
-	if len(cmds) == 0 {
-		continue
-	}
 	if len(cmds[0]) == 0 {
-		continue
+		return []string{}
 	}
-	lcmd := strings.ToLower(cmds[0])
-	return lcmd
+	return cmds
 }
 
 func (n *Navigator) RunCommand(cmd string, args []string) (error, string, bool) {
