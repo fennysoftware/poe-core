@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type RunMethod func(n *Navigator, args []string) error
+type RunMethod func(n *Navigator, args []string) (error, []string, bool)
 
 type Command struct {
 	command         string

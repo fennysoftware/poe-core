@@ -2,6 +2,7 @@ package navigation
 
 import (
 	"fmt"
+	"strings"
 
 	modules "github.com/fennysoftware/poe-core/pkg/modules"
 	packages "github.com/fennysoftware/poe-core/pkg/packages"
@@ -21,9 +22,22 @@ func (n *Navigator) AddCommand(c Command) {
 	n.methods = mds
 }
 
-func (n *Navigator) RunCommand(cmd string, args []string) error {
+func (n *Navigator) ReadCommand() string {
+	command := readline(cwd.String() + " % ")
+	cmds := strings.Split(command, " ")
+	if len(cmds) == 0 {
+		continue
+	}
+	if len(cmds[0]) == 0 {
+		continue
+	}
+	lcmd := strings.ToLower(cmds[0])
+	return lcmd
+}
+
+func (n *Navigator) RunCommand(cmd string, args []string) (error, string, bool) {
 	if len(cmd) == 0 {
-		return nil
+		return nil, "", false
 	}
 	for _, v := range n.methods {
 		if v.command == cmd {
@@ -31,15 +45,15 @@ func (n *Navigator) RunCommand(cmd string, args []string) error {
 				return fmt.Errorf("Command %s not supported at level: %s", cmd, n.cwd.CurrentLevel())
 			}
 
-			_, err := v.Check(args)
+			msg, err := v.Check(args)
 			if err != nil {
-				return err
+				return err, msg, false
 			}
 			return v.Method(n, args)
 		}
 	}
 
-	return fmt.Errorf("Command %s not found", cmd)
+	return fmt.Errorf("Command %s not found", cmd), "", false
 }
 
 func (n *Navigator) CheckCreate(pname string) error {
@@ -98,7 +112,15 @@ func (n *Navigator) Level() string {
 }
 
 func NewNavigator(top string) *Navigator {
-	return &Navigator{projs: make(map[string]*projects.Project), cwd: NewCWD(top)}
+	nav := &Navigator{projs: make(map[string]*projects.Project), cwd: NewCWD(top)}
+	nav.AddCommand(Command{command: "ls", maxnumberofargs: 0, needsargs: false, Method: list})
+	nav.AddCommand(Command{command: "cd", maxnumberofargs: 0, needsargs: false, Method: changepos})
+	nav.AddCommand(Command{command: "pwd", maxnumberofargs: 0, needsargs: false, Method: pwd})
+	nav.AddCommand(Command{command: "lvl", maxnumberofargs: 0, needsargs: false, Method: lvl})
+	nav.AddCommand(Command{command: "help", maxnumberofargs: 0, needsargs: false, Method: printhlp})
+	nav.AddCommand(Command{command: "exit", maxnumberofargs: 0, needsargs: false, Method: exit})
+	nav.AddCommand(Command{command: "path", maxnumberofargs: 0, needsargs: false, Method: pathbuf})
+	return nav
 }
 
 func getActiveProject(n *Navigator, name string) (*projects.Project, error) {
