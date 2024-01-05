@@ -3,6 +3,8 @@ package navigation
 import (
 	"fmt"
 	"strings"
+
+	types "github.com/fennysoftware/poe-core/pkg/types"
 )
 
 const (

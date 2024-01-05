@@ -23,7 +23,7 @@ func (n *Navigator) AddCommand(c Command) {
 }
 
 func (n *Navigator) ReadCommand() []string {
-	command := readline(cwd.String() + " % ")
+	command := readline(n.String() + " % ")
 	cmds := strings.Split(command, " ")
 	if len(cmds[0]) == 0 {
 		return []string{}
@@ -31,25 +31,26 @@ func (n *Navigator) ReadCommand() []string {
 	return cmds
 }
 
-func (n *Navigator) RunCommand(cmd string, args []string) (error, string, bool) {
+func (n *Navigator) RunCommand(cmd string, args []string) (error, []string, bool) {
+	res := []string{}
 	if len(cmd) == 0 {
-		return nil, "", false
+		return nil, res, false
 	}
 	for _, v := range n.methods {
 		if v.command == cmd {
 			if len(v.supportedlevels) > 0 && !slices.Contains(v.supportedlevels, n.cwd.CurrentLevel()) {
-				return fmt.Errorf("Command %s not supported at level: %s", cmd, n.cwd.CurrentLevel())
+				return fmt.Errorf("Command %s not supported at level: %s", cmd, n.cwd.CurrentLevel()), res, false
 			}
 
 			msg, err := v.Check(args)
 			if err != nil {
-				return err, msg, false
+				return err, []string{msg}, false
 			}
 			return v.Method(n, args)
 		}
 	}
 
-	return fmt.Errorf("Command %s not found", cmd), "", false
+	return fmt.Errorf("Command %s not found", cmd), res, false
 }
 
 func (n *Navigator) CheckCreate(pname string) error {
